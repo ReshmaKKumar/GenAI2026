@@ -1,0 +1,180 @@
+{
+  "name": "My workflow 2",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        0,
+        0
+      ],
+      "id": "87517a99-9b69-430c-b71d-37f420707e9b",
+      "name": "When chat message received",
+      "webhookId": "5ccfd248-3568-4416-96d4-c08da0dc7724"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "i want my output like doctor in 3 to 4 statements politely"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        208,
+        0
+      ],
+      "id": "208ffb3f-2a36-42d0-88d4-acd9a914768a",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": "openai/gpt-oss-20b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        80,
+        208
+      ],
+      "id": "81b973f1-0bcf-4b9b-bcec-717b44a22acc",
+      "name": "Groq Chat Model",
+      "credentials": {
+        "groqApi": {
+          "id": "IBfMIJ4s7n1Nks6S",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "contextWindowLength": 20
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        224,
+        208
+      ],
+      "id": "e9c5c8c9-f780-4ce3-b493-add75b93daff",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "sendTo": "reshmakkumar2005@gmail.com",
+        "subject": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Subject', ``, 'string') }}",
+        "message": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Message', ``, 'string') }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.2,
+      "position": [
+        368,
+        208
+      ],
+      "id": "f637d9ec-9036-4ab9-a2f5-c566bd988c75",
+      "name": "Send a message in Gmail",
+      "webhookId": "74a61972-22fa-4203-b4b2-5b8d5249763a",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "Dnxo1VqotZBDk0N6",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.googleContacts",
+      "typeVersion": 1,
+      "position": [
+        560,
+        0
+      ],
+      "id": "8f1cc0e0-fb05-4944-9e3d-069ad883b281",
+      "name": "Create a contact",
+      "credentials": {
+        "googleContactsOAuth2Api": {
+          "id": "lq0mrBjgOd1u9kLa",
+          "name": "Google Contacts account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message in Gmail": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Create a contact",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "bc8fd38f-edb7-47ff-8ac3-8822f4eb6623",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "8de355a8834e8bf6195ae92684945bcfb4dd819dfcb5dc6c39ceace8963fdd1c"
+  },
+  "id": "yNsbPk8JrSxje94C",
+  "tags": []
+}

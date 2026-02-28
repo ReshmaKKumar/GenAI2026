@@ -1,0 +1,180 @@
+{
+  "name": "My workflow 3",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 8
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        0,
+        0
+      ],
+      "id": "8c901aa0-72eb-4220-b610-acf87ebc7c6a",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "url": "https://newsapi.org/v2/everything?q=technology&sortBy=publishedAt&pageSize=5&apiKey=5aef8e414f374c46931621d9d9ec75e3",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        208,
+        0
+      ],
+      "id": "cd979c3d-f36c-4d6b-b6fa-a513ac12ffbf",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "jsCode": "const articles = $json.articles || [];\n\nlet output = \"\";\n\nfor (let i = 0; i < articles.length && i < 5; i++) {\n  const title = articles[i]?.title || \"\";\n  const url = articles[i]?.url || \"\";\n  const image = articles[i]?.urlToImage || \"\";\n\n  output += `\n  <div style=\"margin-bottom:20px;\">\n    <h3>${i + 1}. ${title}</h3>\n    ${image ? `<img src=\"${image}\" style=\"width:300px; border-radius:8px;\" />` : \"\"}\n    <br/>\n    <a href=\"${url}\" target=\"_blank\">👉 Read full article</a>\n  </div>\n  `;\n}\n\nreturn [\n  {\n    json: {\n      news: output || \"No news found 🚫 (check API key)\"\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        352,
+        0
+      ],
+      "id": "b51868f0-6ac6-441e-8aee-723704d66435",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Summarize the following news in 5-6 lines:\n\n{{$node[\"Code in JavaScript\"].json[\"news\"]}}",
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        832,
+        0
+      ],
+      "id": "c7127edc-cad3-4a4a-b7d0-862bb370d712",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {
+        "model": "=llama3",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "typeVersion": 1,
+      "position": [
+        944,
+        224
+      ],
+      "id": "5517ab48-d97d-40ff-b89d-a3aaaf045bd5",
+      "name": "Ollama Chat Model",
+      "credentials": {
+        "ollamaApi": {
+          "id": "j7MkE6QQyFuqgF7B",
+          "name": "Ollama account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "reshmakkumar2005@gmail.com",
+        "subject": "Daily News",
+        "message": "=<h2>📰 AI News Summary</h2>  <p>{{$json[\"response\"]}}</p>  <hr/>  {{$node[\"Code in JavaScript\"].json[\"news\"]}}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1184,
+        0
+      ],
+      "id": "e0aa0599-2e9a-4c1e-8e03-2e1662cd89af",
+      "name": "Send a message",
+      "webhookId": "7c57e337-910e-4d1e-afe4-7267432a2632",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "Dnxo1VqotZBDk0N6",
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ollama Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "5433a5c1-6388-4c69-8314-7dfcc2e2a23a",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "8de355a8834e8bf6195ae92684945bcfb4dd819dfcb5dc6c39ceace8963fdd1c"
+  },
+  "id": "OcX6tZDqjEG6u18K",
+  "tags": []
+}
